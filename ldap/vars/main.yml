@@ -1,0 +1,8 @@
+---
+ldap_host: ldaphost
+ldap_password: ldappassword
+ldap_base_dn: cn=admin,dc=example,dc=com
+ldap_bind_dn: ou=People,dc=example,dc=com
+
+username:
+  - ldapuser1

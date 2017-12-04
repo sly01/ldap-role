@@ -1,0 +1,31 @@
+---
+- name: Get raw info from ldap
+  set_fact:
+    user_array: "{{lookup('pipe','ldapsearch -x -x -LLL -h {{ ldap_host }} -D {{ ldap_base_dn }} -w {{ ldap_password }} -b {{ ldap_bind_dn }} uid={{ item }}').split('\n')}}"
+  with_items: "{{ username }}"
+  register: array_result
+
+#- debug:
+#    msg: "{{ array_result }}"
+#
+- name: make a list
+  set_fact:
+    user_list: "{{ array_result.results | map(attribute='ansible_facts.user_array') | list }}"
+
+- debug:
+    msg: "{{ user_list}}"
+
+
+- name: Parse and create dict
+  set_fact:
+    user_datas: "{{ user_datas|default({}) | combine( {item.split(':')[0]: item.split(':')[1]} ) }}"
+  with_items: "{{ user_list }}"
+
+#- debug:
+#    msg: "{{ user_datas }}"
+
+
+- debug:
+    msg: "{{ user_datas['uid'] }} user id {{ user_datas['uidNumber'] }}"
+- debug:
+    msg: "{{ user_datas['uid'] }} group id {{ user_datas['gidNumber'] }}"
